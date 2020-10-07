@@ -19,4 +19,12 @@ router.route("/users/:userID")
 router.route("/users/:userID/decks")
     .get( validateParam(schemas.idSchema, 'userID'), UserController.getUserDeck)
     .post(validateParam(schemas.idSchema, 'userID'), validateBody(schemas.decksSchema), UserController.newUserDeck)
+
+router.route("/users/signin")
+    .post(validateBody(schemas.authSigninSchema), UserController.signin)
+router.route("/users/signup")
+    .post(validateBody(schemas.authSignupSchema), UserController.signup)
+router.route("/users/secret")
+    .post(UserController.secret)
+
 module.exports = router

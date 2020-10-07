@@ -1,25 +1,18 @@
-/**
- * we can interact with mongoose in three different ways:
- *  [✔] callBack
- *  [✔] promises
- *  [✔] Async / await (promises)
- */
 
  const User = require('../models/User')
  const Deck = require('../models/Deck')
 
-  // callBack
-// const index = (req, res, next) => {
-//     // callBack way
-//     User.find({}, (error, users) => {
-//         if(error) next(error)
-//         return res.status(200).json({users})
-//     })
-    
-//     // return res.status(200).json({
-//     //     message: 'You request to user handle'
-//     // })
-// }
+ const JWT = require('jsonwebtoken')
+ const { JWT_SECRET } = require('../configs/index')
+ const endcodedToken = (userID) => {
+   return JWT.sign({
+    iss: 'Dinh Duc Thien',
+    sub: userID,
+    iat: new Date().getTime(),
+    exp: new Date().setDate(new Date().getDate() + 365)
+   }, JWT_SECRET)
+}
+
 
 // async / await
 // express-promise-router remove try catch
@@ -34,38 +27,6 @@ const newUser = async (req, res, next) => {
         return res.status(201).json({user: newUser})
 }
 
-// // Promise 
-// const index = (req, res, next) => {
-//     // Promises way
-//     User.find({}).then((users) => {
-//         res.status(200).json({users})
-//     }).catch(error => next(error))
-// }
-
-// callback
-// const newUser = (req, res, next) => {
-//     console.log('req.body content', req.body)
-//     //create object model
-
-//     const newUser = new User(req.body)
-//     console.log('newUser', newUser)
-//     newUser.save((error, user) => {
-//         console.error('Error', error)
-//         console.log('UserSave', user)
-//         return res.status(201).json({user})
-//     })
-// }
-// Promise way
-// const newUser = (req, res, next) => {
-//     console.log('req.body content', req.body)
-//     //create object model
-
-//     const newUser = new User(req.body)
-//     console.log('newUser', newUser)
-//     newUser.save().then(user => {
-//         return res.status(201).json({user})
-//     }).catch(error => next(error))
-// }
 
 const getUserById = async (req, res, next) => {
     const { userID }= req.value.params
@@ -116,6 +77,24 @@ const newUserDeck = async (req, res, next) => {
     res.status(201).json({deck: newDeck})
 }
 
+const secret = async (req, res, next) => {}
+
+const signin = async (req, res, next) => {}
+
+const signup = async (req, res, next) => {
+  const { firstName, lastName, email, password } = req.value.body
+  // check if there is a new user with the same user
+  const foundUser = await User.findOne({ email })
+  if (foundUser) return res.status(403).json({error: { message: 'Email already exists'}})
+  // create new user
+  const newUser = new User({firstName, lastName, email, password})
+  newUser.save()
+// endcodedToken
+  const token = endcodedToken(newUser._id)
+  res.setHeader('Authorization', token)
+
+  return res.status(201).json({ success: true })
+}
 
 module.exports = {
     index,
@@ -124,5 +103,8 @@ module.exports = {
     replaceUser,
     updateUser,
     getUserDeck,
-    newUserDeck
+    newUserDeck,
+    secret,
+    signin,
+    signup
 }
