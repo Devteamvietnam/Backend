@@ -6,11 +6,27 @@ const JWT = require('jsonwebtoken')
 
 const encodedToken = (userID) => {
   return JWT.sign({
-    iss: 'Tran Toan',
+    iss: 'Dinh Duc Thien',
     sub: userID,
     iat: new Date().getTime(),
-    exp: new Date().setDate(new Date().getDate() + 3)
+    exp: new Date().setDate(new Date().getDate() + 365)
   }, JWT_SECRET)
+}
+
+const authFacebook = async (req, res, next) => {
+  // Assign a token
+  const token = encodedToken(req.user._id)
+
+  res.setHeader('Authorization', token)
+  return res.status(200).json({ success: true })
+}
+
+const authGoogle = async (req, res, next) => {
+  // Assign a token
+  const token = encodedToken(req.user._id)
+
+  res.setHeader('Authorization', token)
+  return res.status(200).json({ success: true })
 }
 
 const getUser = async (req, res, next) => {
@@ -121,6 +137,8 @@ const updateUser = async (req, res, next) => {
 };
 
 module.exports = {
+  authFacebook,
+  authGoogle,
   getUser,
   getUserDecks,
   index,

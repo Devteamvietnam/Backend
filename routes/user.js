@@ -13,6 +13,10 @@ router.route('/users')
     .get(UserController.index)
     .post(validateBody(schemas.userSchema), UserController.newUser)
 
+router.route('/users/auth/google').post(passport.authenticate('google-token', { session: false }), UserController.authGoogle)
+
+router.route('/users/auth/facebook').post(passport.authenticate('facebook-token', { session: false }), UserController.authFacebook)
+
 router.route('/users/signup').post(validateBody(schemas.authSignUpSchema), UserController.signUp)
 
 router.route('/users/signin').post(validateBody(schemas.authSignInSchema), passport.authenticate('local', { session: false }), UserController.signIn)
