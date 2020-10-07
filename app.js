@@ -1,5 +1,7 @@
 const bodyParser = require('body-parser')
 const express = require('express')
+// config evn
+require('dotenv').config()
 // logger
 const logger = require('morgan')
 
@@ -14,7 +16,8 @@ const helmet = require("helmet");
 const mongooClient = require('mongoose')
     mongooClient.connect('mongodb://localhost:27017/nodejsapi', {
          useNewUrlParser: true,
-         useUnifiedTopology: true 
+         useUnifiedTopology: true,
+         useCreateIndex: true
         })
         .then(() => {
             console.log(' Connected ✔')})
