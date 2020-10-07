@@ -3,7 +3,7 @@ const express = require('express')
 
 const router = require('express-promise-router')()
 
-const DeckController = require('../controller/deck')
+const DeckController = require('../controllers/deck')
 
 const { validateParam, schemas, validateBody } = require('../helpers/validator')
 
