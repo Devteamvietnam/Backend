@@ -77,7 +77,9 @@ const newUserDeck = async (req, res, next) => {
     res.status(201).json({deck: newDeck})
 }
 
-const secret = async (req, res, next) => {}
+const secret = async (req, res, next) => {
+  return res.status(200).json({ resources : true})
+}
 
 const signin = async (req, res, next) => {}
 
