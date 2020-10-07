@@ -1,24 +1,24 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const bcrypt = require('bcryptjs')
+
 const UserSchema = new Schema({
     firstName: {
-        type: String,
-        require: true
+        type: String
     },
     lastName: {
-        type: String,
-        require: true
+        type: String
     },
     email: {
         type: String,
-        require: true,
+        required: true,
         unique: true,
         lowercase: true
     },
     password: {
         type: String,
-        require: true
+        required: true
     },
     decks: [{
         type: Schema.Types.ObjectId,
@@ -26,6 +26,29 @@ const UserSchema = new Schema({
     }]
 })
 
-const User = mongoose.model('User', UserSchema)
+UserSchema.pre('save', async function(next) {
+  try {
+    // Generate a salt
+    const salt = await bcrypt.genSalt(10)
+    // Generate a password hash (salt + hash)
+    const passwordHashed = await bcrypt.hash(this.password, salt)
+    // Re-assign password hashed
+    this.password = passwordHashed
 
+    next()
+  } catch (error) {
+    next(error)
+  }
+})
+
+
+UserSchema.methods.isValidPassword = async function(newPassword) {
+  try {
+    return await bcrypt.compare(newPassword, this.password)
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const User = mongoose.model('User', UserSchema)
 module.exports = User
