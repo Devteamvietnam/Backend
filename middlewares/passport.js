@@ -3,6 +3,7 @@ const JwtStrategy = require('passport-jwt').Strategy
 const LocalStrategy = require('passport-local').Strategy
 const GooglePlusTokenStrategy = require('passport-google-token').Strategy
 const FacebookTokenStrategy = require('passport-facebook-token')
+const GitHubTokenStrategy = require('passport-github-token')
 const { ExtractJwt } = require('passport-jwt')
 const { JWT_SECRET, auth } = require('../configs')
 
@@ -84,6 +85,7 @@ passport.use(
     {
       clientID: auth.facebook.CLIENT_ID,
       clientSecret: auth.facebook.CLIENT_SECRET,
+      fbGraphVersion: 'v3.0'
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -99,6 +101,42 @@ passport.use(
         const newUser = new User({
           authType: 'facebook',
           authFacebookID: profile.id,
+          email: profile.emails[0].value,
+          firstName: profile.name.givenName,
+          lastName: profile.name.familyName
+        })
+
+        await newUser.save()
+
+        done(null, newUser)
+      } catch (error) {
+        done(error, false);
+      }
+    }
+  )
+);
+
+// Passport Github
+passport.use(
+  new GitHubTokenStrategy(
+    {
+      clientID: auth.github.CLIENT_ID,
+      clientSecret: auth.github.CLIENT_SECRET
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        // check whether this current user exists in our database
+        const user = await User.findOne({
+          authGithubID: profile.id,
+          authType: "github",
+        });
+
+        if (user) return done(null, user)
+
+        // If new account
+        const newUser = new User({
+          authType: 'github',
+          authGithubID: profile.id,
           email: profile.emails[0].value,
           firstName: profile.name.givenName,
           lastName: profile.name.familyName

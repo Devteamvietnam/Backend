@@ -27,9 +27,13 @@ const UserSchema = new Schema({
       type: String,
       default: null
     },
+    authGithubID: {
+      type: String,
+      default: null
+    },
     authType: {
       type: String,
-      enum: ['local', 'google', 'facebook'],
+      enum: ['local', 'google', 'facebook', 'github'],
       default: 'local'
     },
     decks: [{
