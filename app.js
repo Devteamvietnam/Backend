@@ -4,6 +4,8 @@ const express = require('express')
 require('dotenv').config()
 // logger
 const logger = require('morgan')
+// cors 
+const cors = require('cors')
 
 const usersRoute = require('./routes/user')
 const deckRoute = require('./routes/deck')
@@ -14,7 +16,7 @@ const helmet = require("helmet");
 
 //DB
 const mongooClient = require('mongoose')
-    mongooClient.connect('mongodb://localhost:27017/nodejsapi', {
+    mongooClient.connect(process.env.Mongodb_CLIENT_ID, {
          useNewUrlParser: true,
          useUnifiedTopology: true,
          useCreateIndex: true
@@ -29,6 +31,7 @@ const mongooClient = require('mongoose')
 app.use(logger('dev')) // dev show so giay hoan thanh cua mot request, run phuong thuc nao v.v
 app.use(bodyParser.json())
 app.use(helmet());
+app.use(cors())
 
 // Routes
 app.get('/', (req, res, next) =>{
